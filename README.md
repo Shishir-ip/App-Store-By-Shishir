@@ -178,10 +178,6 @@ app-store/
 └── .env.local                  # Environment variables (ignored by git)
 ```
 
-
-
-There is no link to the admin page on the public site — you must manually type `/admin` in the URL.
-
 ## License
 
 MIT
