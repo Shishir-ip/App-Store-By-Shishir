@@ -6,7 +6,7 @@ A modern, minimal App Store built with Next.js, Tailwind CSS, and Supabase.
 
 - **Public Store**: Browse apps with search, category filtering, and smooth animations
 - **Dark/Light Mode**: System-aware theme switching with manual override
-- **Admin Panel**: Secure admin at `/admin` with login
+- **Admin Panel**: Secure admin with login
 - **App Management**: Add, edit, delete apps with version control
 - **Supabase Backend**: All data stored in PostgreSQL via Supabase
 - **Responsive Design**: Works beautifully on mobile, tablet, and desktop
@@ -45,8 +45,8 @@ Edit `.env.local`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-NEXT_PUBLIC_ADMIN_USERNAME=shishir
-NEXT_PUBLIC_ADMIN_PASSWORD=appstore182
+NEXT_PUBLIC_ADMIN_USERNAME=******
+NEXT_PUBLIC_ADMIN_PASSWORD=******
 ```
 
 ### 4. Run Locally
@@ -178,12 +178,7 @@ app-store/
 └── .env.local                  # Environment variables (ignored by git)
 ```
 
-## Admin Credentials
 
-- **Username:** `shishir`
-- **Password:** `appstore182`
-
-Access: `https://your-domain.vercel.app/admin`
 
 There is no link to the admin page on the public site — you must manually type `/admin` in the URL.
 
