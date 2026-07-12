@@ -86,8 +86,10 @@ export default function AdminPage() {
     if (!formData.name) return
     setSaving(true)
 
+    const { versions: _, ...appDataWithoutVersions } = formData
+
     const appData = {
-      ...formData,
+      ...appDataWithoutVersions,
       rating: formData.rating ? Number(formData.rating) : null,
     }
 
