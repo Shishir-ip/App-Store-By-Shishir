@@ -43,18 +43,16 @@ export type AppCategory =
   | 'Utilities'
   | 'Other'
 
-export const CATEGORIES: { name: string; icon: string; color: string }[] = [
+export const CATEGORIES: { name: AppCategory; icon: string; color: string }[] = [
   { name: 'Productivity', icon: 'Briefcase', color: 'bg-blue-500' },
-  { name: 'Social', icon: 'Users', color: 'bg-pink-500' },
   { name: 'Entertainment', icon: 'Gamepad2', color: 'bg-purple-500' },
+  { name: 'IPTV', icon: 'Tv', color: 'bg-violet-500' },
   { name: 'Tools', icon: 'Wrench', color: 'bg-orange-500' },
-  { name: 'Games', icon: 'Trophy', color: 'bg-red-500' },
   { name: 'Education', icon: 'GraduationCap', color: 'bg-green-500' },
   { name: 'Finance', icon: 'Wallet', color: 'bg-emerald-500' },
   { name: 'Health', icon: 'Heart', color: 'bg-rose-500' },
   { name: 'Photography', icon: 'Camera', color: 'bg-indigo-500' },
-  { name: 'Music', icon: 'Music', color: 'bg-cyan-500' },
-  { name: 'Communication', icon: 'MessageCircle', color: 'bg-teal-500' },
+  { name: 'Windows Apps', icon: 'Monitor', color: 'bg-sky-500' },
   { name: 'Utilities', icon: 'Settings', color: 'bg-slate-500' },
   { name: 'Other', icon: 'Package', color: 'bg-gray-500' },
 ]
