@@ -32,16 +32,14 @@ export interface Category {
 
 export type AppCategory =
   | 'Productivity'
-  | 'Social'
   | 'Entertainment'
+  | 'IPTV'
   | 'Tools'
-  | 'Games'
   | 'Education'
   | 'Finance'
   | 'Health'
   | 'Photography'
-  | 'Music'
-  | 'Communication'
+  | 'Windows Apps'
   | 'Utilities'
   | 'Other'
 
