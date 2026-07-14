@@ -31,28 +31,38 @@ export interface Category {
 }
 
 export type AppCategory =
-  | 'Productivity'
   | 'Entertainment'
-  | 'IPTV'
   | 'Tools'
+  | 'IPTV'
+  | 'IPTV Player'
+  | 'Customization'
+  | 'Patched'
+  | 'Editing Apps'
+  | 'Productivity'
+  | 'Photography'
+  | 'Utilities'
+  | 'Windows Apps'
   | 'Education'
   | 'Finance'
   | 'Health'
-  | 'Photography'
-  | 'Windows Apps'
-  | 'Utilities'
+  | 'Games'
   | 'Other'
 
 export const CATEGORIES: { name: AppCategory; icon: string; color: string }[] = [
-  { name: 'Productivity', icon: 'Briefcase', color: 'bg-blue-500' },
   { name: 'Entertainment', icon: 'Gamepad2', color: 'bg-purple-500' },
-  { name: 'IPTV', icon: 'Tv', color: 'bg-violet-500' },
   { name: 'Tools', icon: 'Wrench', color: 'bg-orange-500' },
+  { name: 'IPTV', icon: 'Tv', color: 'bg-violet-500' },
+  { name: 'IPTV Player', icon: 'Tv', color: 'bg-violet-600' },
+  { name: 'Customization', icon: 'Palette', color: 'bg-pink-500' },
+  { name: 'Patched', icon: 'ShieldCheck', color: 'bg-red-500' },
+  { name: 'Editing Apps', icon: 'PenTool', color: 'bg-cyan-500' },
+  { name: 'Productivity', icon: 'Briefcase', color: 'bg-blue-500' },
+  { name: 'Photography', icon: 'Camera', color: 'bg-indigo-500' },
+  { name: 'Utilities', icon: 'Settings', color: 'bg-slate-500' },
+  { name: 'Windows Apps', icon: 'Monitor', color: 'bg-sky-500' },
   { name: 'Education', icon: 'GraduationCap', color: 'bg-green-500' },
   { name: 'Finance', icon: 'Wallet', color: 'bg-emerald-500' },
   { name: 'Health', icon: 'Heart', color: 'bg-rose-500' },
-  { name: 'Photography', icon: 'Camera', color: 'bg-indigo-500' },
-  { name: 'Windows Apps', icon: 'Monitor', color: 'bg-sky-500' },
-  { name: 'Utilities', icon: 'Settings', color: 'bg-slate-500' },
+  { name: 'Games', icon: 'Gamepad2', color: 'bg-yellow-500' },
   { name: 'Other', icon: 'Package', color: 'bg-gray-500' },
 ]
