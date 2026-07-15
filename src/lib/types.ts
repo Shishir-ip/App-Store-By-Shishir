@@ -45,7 +45,6 @@ export type AppCategory =
   | 'TV'
   | 'Education'
   | 'Finance'
-  | 'Health'
   | 'Games'
   | 'Other'
 
@@ -64,7 +63,6 @@ export const CATEGORIES: { name: AppCategory; icon: string; color: string }[] = 
   { name: 'TV', icon: 'Tv', color: 'bg-teal-500' },
   { name: 'Education', icon: 'GraduationCap', color: 'bg-green-500' },
   { name: 'Finance', icon: 'Wallet', color: 'bg-emerald-500' },
-  { name: 'Health', icon: 'Heart', color: 'bg-rose-500' },
   { name: 'Games', icon: 'Gamepad2', color: 'bg-yellow-500' },
   { name: 'Other', icon: 'Package', color: 'bg-gray-500' },
 ]
