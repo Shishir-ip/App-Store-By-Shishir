@@ -42,6 +42,7 @@ export type AppCategory =
   | 'Photography'
   | 'Utilities'
   | 'Windows Apps'
+  | 'TV'
   | 'Education'
   | 'Finance'
   | 'Health'
@@ -60,6 +61,7 @@ export const CATEGORIES: { name: AppCategory; icon: string; color: string }[] = 
   { name: 'Photography', icon: 'Camera', color: 'bg-indigo-500' },
   { name: 'Utilities', icon: 'Settings', color: 'bg-slate-500' },
   { name: 'Windows Apps', icon: 'Monitor', color: 'bg-sky-500' },
+  { name: 'TV', icon: 'Tv', color: 'bg-teal-500' },
   { name: 'Education', icon: 'GraduationCap', color: 'bg-green-500' },
   { name: 'Finance', icon: 'Wallet', color: 'bg-emerald-500' },
   { name: 'Health', icon: 'Heart', color: 'bg-rose-500' },
