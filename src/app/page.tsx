@@ -9,7 +9,7 @@ import { Navbar } from '@/components/Navbar'
 import { useApps } from '@/hooks/useApps'
 import { AppItem } from '@/lib/types'
 import { useState, useMemo } from 'react'
-import { Package, Loader2, ArrowDown } from 'lucide-react'
+import { Package, Loader2, ArrowDown, LayoutGrid, List } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function HomePage() {
@@ -18,6 +18,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedApp, setSelectedApp] = useState<AppItem | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const filteredApps = useMemo(() => {
     return apps.filter((app) => {
@@ -118,12 +119,43 @@ export default function HomePage() {
       {/* All Apps Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-8 pb-20">
         <div className="mx-auto max-w-7xl">
-          <h2 className="text-xl font-semibold mb-6">
-            {searchQuery || selectedCategory !== 'All' ? 'Results' : 'All Apps'}
-            <span className="ml-2 text-sm font-normal text-muted-foreground">
-              ({filteredApps.length})
-            </span>
-          </h2>
+          {/* Section Header with View Toggle */}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold">
+              {searchQuery || selectedCategory !== 'All' ? 'Results' : 'All Apps'}
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                ({filteredApps.length})
+              </span>
+            </h2>
+
+            {/* Grid / List Toggle */}
+            <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={cn(
+                  'flex items-center justify-center h-8 w-8 rounded-lg transition-all duration-200',
+                  viewMode === 'grid'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="Grid view"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  'flex items-center justify-center h-8 w-8 rounded-lg transition-all duration-200',
+                  viewMode === 'list'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="List view"
+              >
+                <List className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
 
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
@@ -131,13 +163,18 @@ export default function HomePage() {
               <p className="mt-4 text-muted-foreground">Loading apps...</p>
             </div>
           ) : filteredApps.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className={cn(
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
+                : 'flex flex-col gap-3'
+            )}>
               {filteredApps.map((app, index) => (
                 <AppCard
                   key={app.id}
                   app={app}
                   index={index}
                   onClick={() => handleAppClick(app)}
+                  view={viewMode}
                 />
               ))}
             </div>
