@@ -21,7 +21,7 @@ export async function generateStaticParams() {
     'Patched', 'Editing Apps', 'Productivity', 'Photography', 'Utilities',
     'Windows Apps', 'TV', 'Education', 'Finance', 'Games', 'Other'
   ]
-  return categories.map((name) => ({ name: encodeURIComponent(name) }))
+  return categories.map((name) => ({ name }))
 }
 
 export default async function CategoryPage({ params }: Props) {

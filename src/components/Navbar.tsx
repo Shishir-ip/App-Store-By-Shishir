@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Package, Menu, X, ChevronDown, Github, Heart, Code2, ExternalLink } from 'lucide-react'
+import { Package, Menu, X, ChevronDown, Github, Heart, Code2, ExternalLink, LayoutGrid } from 'lucide-react'
 import { ThemeToggle } from './ThemeToggle'
 import { CATEGORIES } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -11,6 +11,7 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [desktopCatOpen, setDesktopCatOpen] = useState(false)
 
   return (
     <>
@@ -29,6 +30,44 @@ export function Navbar() {
               <a href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Home</a>
               <a href="/favorites/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Favorites</a>
               <a href="/request/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Request</a>
+
+              {/* Desktop Category Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setDesktopCatOpen(!desktopCatOpen)}
+                  className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Categories
+                  <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', desktopCatOpen && 'rotate-180')} />
+                </button>
+                <AnimatePresence>
+                  {desktopCatOpen && (
+                    <>
+                      <div className="fixed inset-0 z-[60]" onClick={() => setDesktopCatOpen(false)} />
+                      <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 top-full mt-2 w-52 p-2 rounded-2xl bg-card border border-border shadow-xl z-[70] max-h-[70vh] overflow-y-auto"
+                      >
+                        {CATEGORIES.map((cat) => (
+                          <a
+                            key={cat.name}
+                            href={`/category/${encodeURIComponent(cat.name)}/`}
+                            onClick={() => setDesktopCatOpen(false)}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-muted transition-colors text-sm text-muted-foreground hover:text-foreground"
+                          >
+                            <LayoutGrid className="h-3.5 w-3.5" />
+                            {cat.name}
+                          </a>
+                        ))}
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <button onClick={() => setAboutOpen(true)} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">About</button>
               <ThemeToggle />
             </div>
