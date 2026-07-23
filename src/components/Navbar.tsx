@@ -128,7 +128,7 @@ export function Navbar() {
                 </div>
               </div>
               <a
-                href="https://github.com/SHISHIR-S-R/"
+                href="https://github.com/Shishir-ip/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-3 rounded-xl bg-muted hover:bg-muted/80 transition-colors group"
@@ -136,7 +136,7 @@ export function Navbar() {
                 <Github className="h-5 w-5 text-primary shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">GitHub</p>
-                  <p className="text-sm text-muted-foreground truncate">github.com/SHISHIR-S-R</p>
+                  <p className="text-sm text-muted-foreground truncate">github.com/Shishir-ip</p>
                 </div>
                 <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
               </a>
