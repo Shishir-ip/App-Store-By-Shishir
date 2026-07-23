@@ -1,18 +1,15 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { AppCard } from '@/components/AppCard'
 import { AppModal } from '@/components/AppModal'
-import { SearchBarWithSuggestions } from '@/components/SearchBarWithSuggestions'
+import { SearchBar } from '@/components/SearchBar'
 import { CategoryFilter } from '@/components/CategoryFilter'
 import { Navbar } from '@/components/Navbar'
-import { HeroCarousel } from '@/components/HeroCarousel'
-import { SkeletonCard, SkeletonCompact, SkeletonList } from '@/components/SkeletonCard'
-import { EmptyState } from '@/components/EmptyState'
 import { useApps } from '@/hooks/useApps'
 import { AppItem } from '@/lib/types'
 import { useState, useMemo } from 'react'
-import { ArrowDown, LayoutGrid, List, Grid3X3 } from 'lucide-react'
+import { Package, Loader2, ArrowDown, LayoutGrid, List, Grid3X3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function HomePage() {
@@ -41,11 +38,6 @@ export default function HomePage() {
     setModalOpen(true)
   }
 
-  const handleSelectSuggestion = (app: AppItem) => {
-    setSearchQuery('')
-    handleAppClick(app)
-  }
-
   const handleCloseModal = () => {
     setModalOpen(false)
     setTimeout(() => setSelectedApp(null), 300)
@@ -56,7 +48,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-10 pb-6 px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden pt-12 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -81,11 +73,9 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mt-8 max-w-xl mx-auto"
           >
-            <SearchBarWithSuggestions
-              apps={apps}
+            <SearchBar
               value={searchQuery}
               onChange={setSearchQuery}
-              onSelectApp={handleSelectSuggestion}
               placeholder="Search for apps, tools, games..."
             />
           </motion.div>
@@ -104,89 +94,137 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Carousel */}
-      <HeroCarousel apps={apps} />
-
-      {/* Featured Grid */}
+      {/* Featured Section */}
       {featuredApps.length > 0 && !searchQuery && selectedCategory === 'All' && (
-        <section className="px-4 sm:px-6 lg:px-8 py-6">
+        <section className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="mx-auto max-w-7xl">
             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
               <ArrowDown className="h-5 w-5 text-primary" />
               Most Popular
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {featuredApps.slice(0, 3).map((app, index) => (
-                <AppCard key={app.id} app={app} index={index} onClick={() => handleAppClick(app)} />
+              {featuredApps.map((app, index) => (
+                <AppCard
+                  key={app.id}
+                  app={app}
+                  index={index}
+                  onClick={() => handleAppClick(app)}
+                />
               ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* All Apps */}
+      {/* All Apps Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-8 pb-20">
         <div className="mx-auto max-w-7xl">
+          {/* Section Header with View Toggle */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">
               {searchQuery || selectedCategory !== 'All' ? 'Results' : 'All Apps'}
-              <span className="ml-2 text-sm font-normal text-muted-foreground">({filteredApps.length})</span>
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                ({filteredApps.length})
+              </span>
             </h2>
 
+            {/* Grid / Compact / List Toggle */}
             <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
-              <button onClick={() => setViewMode('grid')}
-                className={cn('flex items-center justify-center h-8 w-8 rounded-lg transition-all',
-                  viewMode === 'grid' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
+              <button
+                onClick={() => setViewMode('grid')}
+                className={cn(
+                  'flex items-center justify-center h-8 w-8 rounded-lg transition-all duration-200',
+                  viewMode === 'grid'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="Grid view"
+              >
                 <LayoutGrid className="h-4 w-4" />
               </button>
-              <button onClick={() => setViewMode('compact')}
-                className={cn('flex items-center justify-center h-8 w-8 rounded-lg transition-all',
-                  viewMode === 'compact' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
+              <button
+                onClick={() => setViewMode('compact')}
+                className={cn(
+                  'flex items-center justify-center h-8 w-8 rounded-lg transition-all duration-200',
+                  viewMode === 'compact'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="Compact view"
+              >
                 <Grid3X3 className="h-4 w-4" />
               </button>
-              <button onClick={() => setViewMode('list')}
-                className={cn('flex items-center justify-center h-8 w-8 rounded-lg transition-all',
-                  viewMode === 'list' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
+              <button
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  'flex items-center justify-center h-8 w-8 rounded-lg transition-all duration-200',
+                  viewMode === 'list'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="List view"
+              >
                 <List className="h-4 w-4" />
               </button>
             </div>
           </div>
 
           {loading ? (
-            <div className={cn(
-              viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
-                : viewMode === 'compact' ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4'
-                : 'flex flex-col gap-3'
-            )}>
-              {Array.from({ length: 8 }).map((_, i) => (
-                viewMode === 'compact' ? <SkeletonCompact key={i} />
-                  : viewMode === 'list' ? <SkeletonList key={i} />
-                  : <SkeletonCard key={i} />
-              ))}
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="mt-4 text-muted-foreground">Loading apps...</p>
             </div>
           ) : filteredApps.length > 0 ? (
             <div className={cn(
-              viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
-                : viewMode === 'compact' ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4'
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
+                : viewMode === 'compact'
+                ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4'
                 : 'flex flex-col gap-3'
             )}>
               {filteredApps.map((app, index) => (
-                <AppCard key={app.id} app={app} index={index} onClick={() => handleAppClick(app)} view={viewMode} />
+                <AppCard
+                  key={app.id}
+                  app={app}
+                  index={index}
+                  onClick={() => handleAppClick(app)}
+                  view={viewMode}
+                />
               ))}
             </div>
           ) : (
-            <EmptyState type={searchQuery ? 'no-results' : 'no-apps'} />
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center py-20 text-center"
+            >
+              <div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
+                <Package className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">No apps found</h3>
+              <p className="text-muted-foreground mt-1">
+                Try adjusting your search or category filter.
+              </p>
+            </motion.div>
           )}
         </div>
       </section>
 
+      {/* Footer */}
       <footer className="border-t border-border py-8 px-4">
         <div className="mx-auto max-w-7xl text-center">
-          <p className="text-sm text-muted-foreground">App Store — Built with Next.js & Supabase</p>
+          <p className="text-sm text-muted-foreground">
+            App Store — Built with Next.js & Supabase
+          </p>
         </div>
       </footer>
 
-      <AppModal app={selectedApp} isOpen={modalOpen} onClose={handleCloseModal} />
+      {/* Modal */}
+      <AppModal
+        app={selectedApp}
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   )
 }
