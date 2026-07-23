@@ -120,14 +120,14 @@ export default function AdminPage() {
   }
 
   const handleBulkDelete = async () => {
-    for (const id of selectedIds) await removeApp(id)
+    for (const id of Array.from(selectedIds)) await removeApp(id)
     setSelectedIds(new Set())
     setBulkMode(false)
     showToast(`${selectedIds.size} apps deleted`, 'success')
   }
 
   const handleBulkCategory = async (category: string) => {
-    for (const id of selectedIds) await editApp(id, { category })
+    for (const id of Array.from(selectedIds)) await editApp(id, { category })
     setSelectedIds(new Set())
     setBulkMode(false)
     await loadApps()
