@@ -127,20 +127,20 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
           </div>
         </motion.div>
 
+        {/* ─── Screenshots ─── */}
+        {screenshots.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="mt-8">
+            <ScreenshotsGallery screenshots={screenshots} appName={app.name} />
+          </motion.div>
+        )}
+
         {/* ─── About / Description ─── */}
         {app.description && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="mt-8">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} className="mt-8">
             <h2 className="text-lg font-semibold mb-3">About</h2>
             <div className="text-muted-foreground leading-relaxed">
               <LinkifyText text={app.description} />
             </div>
-          </motion.div>
-        )}
-
-        {/* ─── Screenshots ─── */}
-        {screenshots.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
-            <ScreenshotsGallery screenshots={screenshots} appName={app.name} />
           </motion.div>
         )}
 
