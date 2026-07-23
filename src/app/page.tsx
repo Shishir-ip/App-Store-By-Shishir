@@ -9,7 +9,7 @@ import { Navbar } from '@/components/Navbar'
 import { useApps } from '@/hooks/useApps'
 import { AppItem } from '@/lib/types'
 import { useState, useMemo } from 'react'
-import { Package, Loader2, ArrowDown, LayoutGrid, List } from 'lucide-react'
+import { Package, Loader2, ArrowDown, LayoutGrid, List, Grid3X3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function HomePage() {
@@ -18,7 +18,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedApp, setSelectedApp] = useState<AppItem | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [viewMode, setViewMode] = useState<'grid' | 'compact' | 'list'>('grid')
 
   const filteredApps = useMemo(() => {
     return apps.filter((app) => {
@@ -128,7 +128,7 @@ export default function HomePage() {
               </span>
             </h2>
 
-            {/* Grid / List Toggle */}
+            {/* Grid / Compact / List Toggle */}
             <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
               <button
                 onClick={() => setViewMode('grid')}
@@ -141,6 +141,18 @@ export default function HomePage() {
                 title="Grid view"
               >
                 <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('compact')}
+                className={cn(
+                  'flex items-center justify-center h-8 w-8 rounded-lg transition-all duration-200',
+                  viewMode === 'compact'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="Compact view"
+              >
+                <Grid3X3 className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
@@ -166,6 +178,8 @@ export default function HomePage() {
             <div className={cn(
               viewMode === 'grid'
                 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
+                : viewMode === 'compact'
+                ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4'
                 : 'flex flex-col gap-3'
             )}>
               {filteredApps.map((app, index) => (

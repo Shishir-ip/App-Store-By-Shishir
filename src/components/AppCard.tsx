@@ -1,6 +1,6 @@
 'use client'
 
-import { Download, Star, ExternalLink } from 'lucide-react'
+import { Download, Star } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { AppItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -10,7 +10,7 @@ interface AppCardProps {
   app: AppItem
   index: number
   onClick: () => void
-  view?: 'grid' | 'list'
+  view?: 'grid' | 'compact' | 'list'
 }
 
 export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
@@ -25,6 +25,41 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
 
   const hasVersions = app.versions && app.versions.length > 0
   const displayVersion = hasVersions ? app.versions![0].version : '1.0.0'
+
+  // ─── COMPACT VIEW (icon grid) ───
+  if (view === 'compact') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.25, delay: index * 0.03 }}
+        whileHover={{ scale: 1.06, transition: { duration: 0.15 } }}
+        onClick={onClick}
+        className="group cursor-pointer flex flex-col items-center text-center"
+      >
+        {app.logo_url ? (
+          <img
+            src={app.logo_url}
+            alt={app.name}
+            className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover shadow-md group-hover:shadow-lg transition-shadow"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none'
+            }}
+          />
+        ) : (
+          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-bold text-xl shadow-md group-hover:shadow-lg transition-shadow">
+            {app.name.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <p className="mt-2 text-xs font-medium text-foreground truncate w-full px-1 group-hover:text-primary transition-colors">
+          {app.name}
+        </p>
+        <p className="text-[10px] text-muted-foreground truncate w-full px-1">
+          {app.category}
+        </p>
+      </motion.div>
+    )
+  }
 
   // ─── LIST VIEW ───
   if (view === 'list') {
@@ -42,7 +77,6 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
           'transition-shadow duration-300'
         )}
       >
-        {/* Logo */}
         {app.logo_url ? (
           <img
             src={app.logo_url}
@@ -58,7 +92,6 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
           </div>
         )}
 
-        {/* Info */}
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
             {app.name}
@@ -85,7 +118,6 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
           </div>
         </div>
 
-        {/* Download Button */}
         <button
           onClick={handleDownload}
           className={cn(
@@ -103,7 +135,7 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
     )
   }
 
-  // ─── GRID VIEW (default) ───
+  // ─── GRID VIEW (default, detailed) ───
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
