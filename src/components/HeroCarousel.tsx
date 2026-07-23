@@ -12,7 +12,12 @@ interface HeroCarouselProps {
 }
 
 export function HeroCarousel({ apps }: HeroCarouselProps) {
-  const featured = [...apps].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)).slice(0, 5)
+  // Featured apps = priority > 0, sorted by priority desc, then by downloads
+  const featured = [...apps]
+    .filter((a) => (a.priority || 0) > 0)
+    .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+    .slice(0, 5)
+
   const [current, setCurrent] = useState(0)
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % featured.length), [featured.length])
