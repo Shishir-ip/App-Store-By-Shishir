@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useApps } from '@/hooks/useApps'
 import { AppItem, AppVersion, AppRequest, CATEGORIES } from '@/lib/types'
 import { cn, formatDate } from '@/lib/utils'
-import { createVersion, updateVersion, deleteVersion, fetchRequests, updateRequestStatus, deleteRequest } from '@/lib/supabase'
+import { createVersion, updateVersion, deleteVersion, fetchRequests, updateRequestStatus, deleteRequest, syncScreenshots } from '@/lib/supabase'
 import { showToast } from '@/components/Toast'
 
 export default function AdminPage() {
@@ -118,7 +118,6 @@ export default function AdminPage() {
     const appData = {
       ...appDataWithoutArrays,
       rating: formData.rating ? Number(formData.rating) : null,
-      screenshots,
     }
 
     let app: AppItem | null
@@ -126,6 +125,9 @@ export default function AdminPage() {
     else app = await addApp(appData)
 
     if (app) {
+      // Save screenshots to relational table
+      await syncScreenshots(app.id, screenshots)
+
       for (const v of versions) {
         if (v.id) await updateVersion(v.id, v as Partial<AppVersion>)
         else if (v.version && v.direct_link) await createVersion({ ...v, app_id: app.id } as Partial<AppVersion>)
@@ -147,6 +149,20 @@ export default function AdminPage() {
   }
 
   const handleDuplicate = async (app: AppItem) => {
+    const { id, created_at, updated_at, versions, downloads, screenshots, ...rest } = app as any
+    const newApp = await addApp({ ...rest, name: `${rest.name} (Copy)`, downloads: 0 })
+    if (newApp) {
+      for (const v of app.versions || []) {
+        await createVersion({ app_id: newApp.id, version: v.version, direct_link: v.direct_link })
+      }
+      // Copy screenshots to new app
+      if (screenshots && screenshots.length > 0) {
+        await syncScreenshots(newApp.id, screenshots)
+      }
+      await loadApps()
+      showToast('App duplicated!', 'success')
+    }
+  }
     const { id, created_at, updated_at, versions, downloads, ...rest } = app as any
     const newApp = await addApp({ ...rest, name: `${rest.name} (Copy)`, downloads: 0 })
     if (newApp) {

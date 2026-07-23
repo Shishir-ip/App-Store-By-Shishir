@@ -6,6 +6,13 @@ export interface AppVersion {
   created_at: string
 }
 
+export interface AppScreenshot {
+  id: string
+  app_id: string
+  url: string
+  created_at: string
+}
+
 export interface AppItem {
   id: string
   name: string
