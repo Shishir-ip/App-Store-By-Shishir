@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { AppItem } from '@/lib/types'
 import { fetchApps, fetchAppById, createApp, updateApp, deleteApp } from '@/lib/supabase'
 
-export function useApps() {
+export function useApps(includeDrafts = false) {
   const [apps, setApps] = useState<AppItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -13,14 +13,14 @@ export function useApps() {
     setLoading(true)
     setError(null)
     try {
-      const data = await fetchApps()
+      const data = await fetchApps(includeDrafts)
       setApps(data)
     } catch (err) {
       setError('Failed to load apps')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [includeDrafts])
 
   useEffect(() => {
     loadApps()

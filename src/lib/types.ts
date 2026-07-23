@@ -21,6 +21,10 @@ export interface AppItem {
   created_at: string
   updated_at: string
   versions?: AppVersion[]
+  // New fields (add to Supabase)
+  is_draft?: boolean
+  priority?: number
+  screenshots?: string[]
 }
 
 export interface Category {
