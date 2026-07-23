@@ -27,6 +27,16 @@ export interface AppItem {
   screenshots?: string[]
 }
 
+export interface AppRequest {
+  id: string
+  name: string
+  category: string | null
+  description: string | null
+  link: string | null
+  created_at: string
+  status: 'pending' | 'approved' | 'rejected'
+}
+
 export interface Category {
   id: string
   name: string

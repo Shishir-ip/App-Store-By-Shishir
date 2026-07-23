@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar'
 import { Send, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { showToast } from '@/components/Toast'
+import { createRequest } from '@/lib/supabase'
 
 export default function RequestPage() {
   const [submitted, setSubmitted] = useState(false)
@@ -17,11 +18,18 @@ export default function RequestPage() {
     if (!form.name.trim()) return
     setSending(true)
     try {
-      const requests = JSON.parse(localStorage.getItem('appstore_requests') || '[]')
-      requests.push({ ...form, id: Date.now(), createdAt: new Date().toISOString() })
-      localStorage.setItem('appstore_requests', JSON.stringify(requests))
-      setSubmitted(true)
-      showToast('Request submitted successfully!', 'success')
+      const result = await createRequest({
+        name: form.name.trim(),
+        category: form.category.trim() || null,
+        description: form.description.trim() || null,
+        link: form.link.trim() || null,
+      })
+      if (result) {
+        setSubmitted(true)
+        showToast('Request submitted successfully!', 'success')
+      } else {
+        showToast('Something went wrong', 'error')
+      }
     } catch {
       showToast('Something went wrong', 'error')
     }

@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { AppItem } from '@/lib/types'
 import { fetchApps } from '@/lib/supabase'
@@ -29,10 +28,6 @@ export default async function CategoryPage({ params }: Props) {
   const categoryName = decodeURIComponent(params.name)
   const allApps = await fetchApps()
   const apps = allApps.filter((app: AppItem) => app.category === categoryName)
-
-  if (apps.length === 0 && allApps.length > 0) {
-    notFound()
-  }
 
   return <CategoryClientPage categoryName={categoryName} apps={apps} />
 }
