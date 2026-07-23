@@ -163,17 +163,6 @@ export default function AdminPage() {
       showToast('App duplicated!', 'success')
     }
   }
-    const { id, created_at, updated_at, versions, downloads, ...rest } = app as any
-    const newApp = await addApp({ ...rest, name: `${rest.name} (Copy)`, downloads: 0 })
-    if (newApp) {
-      for (const v of app.versions || []) {
-        await createVersion({ app_id: newApp.id, version: v.version, direct_link: v.direct_link })
-      }
-      await loadApps()
-      showToast('App duplicated!', 'success')
-    }
-  }
-
   // ─── Bulk Operations ───
   const handleBulkDelete = async () => {
     for (const id of Array.from(selectedIds)) await removeApp(id)

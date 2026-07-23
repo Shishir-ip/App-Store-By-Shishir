@@ -18,12 +18,14 @@ CREATE INDEX IF NOT EXISTS idx_app_screenshots_app_id ON app_screenshots(app_id)
 ALTER TABLE app_screenshots ENABLE ROW LEVEL SECURITY;
 
 -- 4. Allow public read access
-CREATE POLICY IF NOT EXISTS "Public read access"
+DROP POLICY IF EXISTS "Public read access" ON app_screenshots;
+CREATE POLICY "Public read access"
   ON app_screenshots FOR SELECT
   USING (true);
 
 -- 5. Allow authenticated insert/update/delete (for admin)
-CREATE POLICY IF NOT EXISTS "Authenticated full access"
+DROP POLICY IF EXISTS "Authenticated full access" ON app_screenshots;
+CREATE POLICY "Authenticated full access"
   ON app_screenshots FOR ALL
   USING (auth.role() = 'authenticated')
   WITH CHECK (auth.role() = 'authenticated');
