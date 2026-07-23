@@ -1,18 +1,21 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { AppCard } from '@/components/AppCard'
-import { AppModal } from '@/components/AppModal'
 import { Navbar } from '@/components/Navbar'
 import { AppItem } from '@/lib/types'
-import { useState } from 'react'
 import { Package, LayoutGrid, List, Grid3X3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useState } from 'react'
 
 export default function CategoryClientPage({ categoryName, apps }: { categoryName: string; apps: AppItem[] }) {
-  const [selectedApp, setSelectedApp] = useState<AppItem | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
+  const router = useRouter()
   const [viewMode, setViewMode] = useState<'grid' | 'compact' | 'list'>('grid')
+
+  const handleAppClick = (app: AppItem) => {
+    router.push(`/app/${app.id}/`)
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,7 +48,7 @@ export default function CategoryClientPage({ categoryName, apps }: { categoryNam
                 : 'flex flex-col gap-3'
             )}>
               {apps.map((app, index) => (
-                <AppCard key={app.id} app={app} index={index} onClick={() => { setSelectedApp(app); setModalOpen(true); }} view={viewMode} />
+                <AppCard key={app.id} app={app} index={index} onClick={() => handleAppClick(app)} view={viewMode} />
               ))}
             </div>
           ) : (
@@ -63,8 +66,6 @@ export default function CategoryClientPage({ categoryName, apps }: { categoryNam
           <p className="text-sm text-muted-foreground">App Store — Built with Next.js & Supabase</p>
         </div>
       </footer>
-
-      <AppModal app={selectedApp} isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedApp(null), 300); }} />
     </div>
   )
 }

@@ -1,23 +1,24 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/Navbar'
 import { AppCard } from '@/components/AppCard'
-import { AppModal } from '@/components/AppModal'
 import { useApps } from '@/hooks/useApps'
 import { useFavorites } from '@/components/FavoritesProvider'
-import { AppItem } from '@/lib/types'
-import { useState } from 'react'
 import { Heart } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
 
 export default function FavoritesPage() {
+  const router = useRouter()
   const { apps, loading } = useApps()
   const { favorites } = useFavorites()
-  const [selectedApp, setSelectedApp] = useState<AppItem | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
 
   const favoriteApps = apps.filter((app) => favorites.includes(app.id))
+
+  const handleAppClick = (appId: string) => {
+    router.push(`/app/${appId}/`)
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,7 +44,7 @@ export default function FavoritesPage() {
         ) : favoriteApps.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {favoriteApps.map((app, index) => (
-              <AppCard key={app.id} app={app} index={index} onClick={() => { setSelectedApp(app); setModalOpen(true); }} />
+              <AppCard key={app.id} app={app} index={index} onClick={() => handleAppClick(app.id)} />
             ))}
           </div>
         ) : (
@@ -51,7 +52,11 @@ export default function FavoritesPage() {
         )}
       </main>
 
-      <AppModal app={selectedApp} isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedApp(null), 300); }} />
+      <footer className="border-t border-border py-8 px-4">
+        <div className="mx-auto max-w-7xl text-center">
+          <p className="text-sm text-muted-foreground">App Store — Built with Next.js & Supabase</p>
+        </div>
+      </footer>
     </div>
   )
 }

@@ -1,8 +1,8 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { AppCard } from '@/components/AppCard'
-import { AppModal } from '@/components/AppModal'
 import { SearchBarWithSuggestions } from '@/components/SearchBarWithSuggestions'
 import { CategoryFilter } from '@/components/CategoryFilter'
 import { Navbar } from '@/components/Navbar'
@@ -16,11 +16,10 @@ import { ArrowDown, LayoutGrid, List, Grid3X3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function HomePage() {
+  const router = useRouter()
   const { apps, loading } = useApps()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [selectedApp, setSelectedApp] = useState<AppItem | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'compact' | 'list'>('grid')
 
   const filteredApps = useMemo(() => {
@@ -37,26 +36,20 @@ export default function HomePage() {
   }, [apps])
 
   const handleAppClick = (app: AppItem) => {
-    setSelectedApp(app)
-    setModalOpen(true)
+    router.push(`/app/${app.id}/`)
   }
 
   const handleSelectSuggestion = (app: AppItem) => {
     setSearchQuery('')
-    handleAppClick(app)
-  }
-
-  const handleCloseModal = () => {
-    setModalOpen(false)
-    setTimeout(() => setSelectedApp(null), 300)
+    router.push(`/app/${app.id}/`)
   }
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-10 pb-6 px-4 sm:px-6 lg:px-8">
+      {/* Hero Section — overflow-hidden REMOVED to fix search dropdown clipping */}
+      <section className="relative pt-10 pb-6 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -185,8 +178,6 @@ export default function HomePage() {
           <p className="text-sm text-muted-foreground">App Store — Built with Next.js & Supabase</p>
         </div>
       </footer>
-
-      <AppModal app={selectedApp} isOpen={modalOpen} onClose={handleCloseModal} />
     </div>
   )
 }

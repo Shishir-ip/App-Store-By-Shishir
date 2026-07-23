@@ -80,7 +80,7 @@ export function SearchBarWithSuggestions({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 right-0 mt-2 p-2 rounded-2xl bg-card border border-border shadow-xl z-50"
+            className="absolute top-full left-0 right-0 mt-2 p-2 rounded-2xl bg-card border border-border shadow-xl z-[60]"
           >
             {suggestions.map((app) => (
               <button
