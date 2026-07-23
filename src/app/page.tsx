@@ -12,9 +12,8 @@ import { EmptyState } from '@/components/EmptyState'
 import { useApps } from '@/hooks/useApps'
 import { AppItem } from '@/lib/types'
 import { useState, useMemo } from 'react'
-import { Package, Loader2, ArrowDown, LayoutGrid, List, Grid3X3 } from 'lucide-react'
+import { ArrowDown, LayoutGrid, List, Grid3X3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { showToast } from '@/components/Toast'
 
 export default function HomePage() {
   const { apps, loading } = useApps()
@@ -108,7 +107,7 @@ export default function HomePage() {
       {/* Featured Carousel */}
       <HeroCarousel apps={apps} />
 
-      {/* Featured Grid (static) */}
+      {/* Featured Grid */}
       {featuredApps.length > 0 && !searchQuery && selectedCategory === 'All' && (
         <section className="px-4 sm:px-6 lg:px-8 py-6">
           <div className="mx-auto max-w-7xl">
@@ -125,15 +124,13 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* All Apps Section */}
+      {/* All Apps */}
       <section className="px-4 sm:px-6 lg:px-8 py-8 pb-20">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">
               {searchQuery || selectedCategory !== 'All' ? 'Results' : 'All Apps'}
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                ({filteredApps.length})
-              </span>
+              <span className="ml-2 text-sm font-normal text-muted-foreground">({filteredApps.length})</span>
             </h2>
 
             <div className="flex items-center gap-1 rounded-xl bg-muted p-1">

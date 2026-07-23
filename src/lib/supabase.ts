@@ -6,10 +6,11 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function fetchApps(): Promise<AppItem[]> {
+export async function fetchApps(includeDrafts = false): Promise<AppItem[]> {
   const { data, error } = await supabase
     .from('apps')
     .select('*, versions:app_versions(*)')
+    .order('priority', { ascending: false })
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -17,12 +18,19 @@ export async function fetchApps(): Promise<AppItem[]> {
     return []
   }
 
-  return (data || []).map((app: any) => ({
+  let apps = (data || []).map((app: any) => ({
     ...app,
     downloads: app.downloads || 0,
     rating: app.rating || 0,
     versions: app.versions || [],
   }))
+
+  // Filter out drafts for public store
+  if (!includeDrafts) {
+    apps = apps.filter((app: AppItem) => !app.is_draft)
+  }
+
+  return apps
 }
 
 export async function fetchAppById(id: string): Promise<AppItem | null> {

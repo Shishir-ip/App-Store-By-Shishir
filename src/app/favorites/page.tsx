@@ -24,11 +24,7 @@ export default function FavoritesPage() {
       <Navbar />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-12 pb-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 mb-8"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3 mb-8">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/10">
             <Heart className="h-5 w-5 text-rose-500 fill-rose-500" />
           </div>
@@ -47,12 +43,7 @@ export default function FavoritesPage() {
         ) : favoriteApps.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {favoriteApps.map((app, index) => (
-              <AppCard
-                key={app.id}
-                app={app}
-                index={index}
-                onClick={() => { setSelectedApp(app); setModalOpen(true); }}
-              />
+              <AppCard key={app.id} app={app} index={index} onClick={() => { setSelectedApp(app); setModalOpen(true); }} />
             ))}
           </div>
         ) : (
@@ -60,10 +51,7 @@ export default function FavoritesPage() {
         )}
       </main>
 
-      <AppModal app={selectedApp} isOpen={modalOpen} onClose={() => {
-        setModalOpen(false)
-        setTimeout(() => setSelectedApp(null), 300)
-      }} />
+      <AppModal app={selectedApp} isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedApp(null), 300); }} />
     </div>
   )
 }
