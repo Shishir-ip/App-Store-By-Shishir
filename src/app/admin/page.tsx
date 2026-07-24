@@ -18,7 +18,7 @@ import { showToast } from '@/components/Toast'
 
 export default function AdminPage() {
   const { isAuthenticated, isLoading, login, logout } = useAuth()
-  const { apps, loading: appsLoading, loadApps, addApp, editApp, removeApp } = useApps()
+  const { apps, loading: appsLoading, loadApps, addApp, editApp, removeApp } = useApps(true)
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')

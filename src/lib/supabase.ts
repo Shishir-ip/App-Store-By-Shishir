@@ -36,6 +36,10 @@ export async function fetchApps(includeDrafts = false): Promise<AppItem[]> {
       .in('app_id', appIds)
       .order('created_at', { ascending: true })
 
+    if (ssError) {
+      console.error('Error fetching screenshots:', ssError)
+    }
+
     if (!ssError && ssData) {
       for (const ss of ssData as AppScreenshot[]) {
         if (!screenshotsMap[ss.app_id]) screenshotsMap[ss.app_id] = []
@@ -44,9 +48,12 @@ export async function fetchApps(includeDrafts = false): Promise<AppItem[]> {
     }
   }
 
-  let result = apps.map((app: AppItem) => ({
+  let result = apps.map((app: any) => ({
     ...app,
-    screenshots: screenshotsMap[app.id] || [],
+    // Use relational table screenshots, fallback to old array column
+    screenshots: screenshotsMap[app.id]?.length
+      ? screenshotsMap[app.id]
+      : (app.screenshots || []),
   }))
 
   // Filter out drafts for public store
@@ -76,9 +83,18 @@ export async function fetchAppById(id: string): Promise<AppItem | null> {
     .eq('app_id', id)
     .order('created_at', { ascending: true })
 
-  const screenshots = (!ssError && ssData)
+  if (ssError) {
+    console.error('Error fetching screenshots for app', id, ':', ssError)
+  }
+
+  const screenshotsFromTable = (!ssError && ssData)
     ? (ssData as AppScreenshot[]).map((s) => s.url)
     : []
+
+  // Fallback to old array column if relational table is empty
+  const screenshots = screenshotsFromTable.length > 0
+    ? screenshotsFromTable
+    : (data?.screenshots || [])
 
   return data ? {
     ...data,
