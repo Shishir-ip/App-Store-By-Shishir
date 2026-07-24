@@ -4,6 +4,10 @@ import { fetchApps } from '@/lib/supabase'
 import { AppItem } from '@/lib/types'
 import AppDetailClient from './AppDetailClient'
 
+// Force dynamic rendering — never serve stale cached data
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 interface Props {
   params: { id: string }
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   Download, Star, ExternalLink, Calendar, User, Hash,
@@ -13,14 +13,49 @@ import { ScreenshotsGallery } from '@/components/ScreenshotsGallery'
 import { useFavorites } from '@/components/FavoritesProvider'
 import { cn, formatDate } from '@/lib/utils'
 import { LinkifyText } from '@/components/LinkifyText'
-import { incrementDownloads } from '@/lib/supabase'
+import { incrementDownloads, supabase } from '@/lib/supabase'
 import { showToast } from '@/components/Toast'
 import Link from 'next/link'
 
 export default function AppDetailClient({ app, allApps }: { app: AppItem; allApps: AppItem[] }) {
   const [showVersions, setShowVersions] = useState(false)
   const [showQr, setShowQr] = useState(false)
+  const [screenshots, setScreenshots] = useState<string[]>(app.screenshots || [])
   const { isFavorite, toggleFavorite } = useFavorites()
+
+  // Client-side fallback: fetch screenshots directly from relational table
+  useEffect(() => {
+    const fetchScreenshots = async () => {
+      // If server already gave us screenshots, use them
+      if (app.screenshots && app.screenshots.length > 0) {
+        setScreenshots(app.screenshots)
+        return
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('app_screenshots')
+          .select('url')
+          .eq('app_id', app.id)
+          .order('created_at', { ascending: true })
+
+        if (error) {
+          console.error('Client screenshot fetch error:', error)
+          return
+        }
+
+        if (data && data.length > 0) {
+          const urls = data.map((s: any) => s.url)
+          console.log('Client fetched screenshots:', urls)
+          setScreenshots(urls)
+        }
+      } catch (err) {
+        console.error('Client screenshot fetch exception:', err)
+      }
+    }
+
+    fetchScreenshots()
+  }, [app.id, app.screenshots])
 
   const handleDownload = async (link?: string) => {
     const downloadLink = link || app.versions?.[0]?.direct_link || app.link
@@ -35,7 +70,6 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
     .filter((a) => a.category === app.category && a.id !== app.id)
     .slice(0, 4)
 
-  const screenshots: string[] = app.screenshots || []
   const downloadLink = app.versions?.[0]?.direct_link || app.link || ''
   const qrUrl = downloadLink
     ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(downloadLink)}`
