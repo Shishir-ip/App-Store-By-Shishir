@@ -375,26 +375,7 @@ export default function AdminPage() {
     video_url: formData.video_url || null,
     file_type: formData.file_type || null,
   }
-  const previewApp: AppItem = {
-    id: 'preview',
-    name: formData.name || 'App Name',
-    description: formData.description || null,
-    category: formData.category || 'Other',
-    logo_url: formData.logo_url || null,
-    banner_url: formData.banner_url || null,
-    link: formData.link || null,
-    developer: formData.developer || null,
-    file_size: formData.file_size || null,
-    rating: formData.rating || null,
-    downloads: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    versions: versions as AppVersion[],
-    screenshots,
-    is_draft: formData.is_draft,
-    priority: formData.priority,
-  }
-
+  
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
 
   if (!isAuthenticated) {
