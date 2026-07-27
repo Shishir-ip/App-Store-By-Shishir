@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { fetchApps } from '@/lib/supabase'
+import { fetchAppById, fetchApps } from '@/lib/supabase'
 import { AppItem } from '@/lib/types'
 import AppDetailClient from './AppDetailClient'
 import { AppDetailSkeleton } from '@/components/AppDetailSkeleton'
@@ -15,11 +15,40 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const apps = await fetchApps()
-  const app = apps.find((a: AppItem) => a.id === params.id)
+  const app = await fetchAppById(params.id)
+  if (!app) {
+    return {
+      title: 'App Not Found',
+      description: 'This app could not be found.',
+    }
+  }
+
+  const title = `${app.name} — App Store`
+  const description = app.description || `Download ${app.name} from App Store`
+  const image = app.banner_url || app.logo_url || undefined
+  const url = `https://app-store-by-shishir.vercel.app/app/${app.id}/`
+
   return {
-    title: app ? `${app.name} — App Store` : 'App Not Found',
-    description: app?.description || 'Discover amazing apps',
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'App Store by Shishir',
+      images: image ? [{ url: image, width: 1200, height: 630, alt: app.name }] : [],
+      locale: 'en_US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: image ? [image] : [],
+    },
+    alternates: {
+      canonical: url,
+    },
   }
 }
 
@@ -29,16 +58,18 @@ export async function generateStaticParams() {
 }
 
 export default async function AppDetailPage({ params }: Props) {
-  const apps = await fetchApps()
-  const app = apps.find((a: AppItem) => a.id === params.id)
+  const app = await fetchAppById(params.id)
 
   if (!app) {
     notFound()
   }
 
+  // Fetch all apps for "related" section
+  const allApps = await fetchApps()
+
   return (
     <Suspense fallback={<AppDetailSkeleton />}>
-      <AppDetailClient app={app} allApps={apps} />
+      <AppDetailClient app={app} allApps={allApps} />
     </Suspense>
   )
 }

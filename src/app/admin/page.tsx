@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Shield, LogOut, Plus, Pencil, Trash2, X, ChevronDown,
+  Shield, LogOut, Plus, Pencil, Trash2, X, ChevronDown, ChevronLeft, ChevronRight,
   Package, Search, AlertTriangle, Download, ExternalLink,
   ArrowLeft, Loader2, Check, Copy, Pin, Star, Eye,
   Upload, FileSpreadsheet, CheckSquare, Square,
@@ -65,6 +65,12 @@ export default function AdminPage() {
   const [screenshotInput, setScreenshotInput] = useState('')
 
   // CSV
+  const [csvText, setCsvText] = useState('')
+  const [showCsvImport, setShowCsvImport] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  // Category scroll
+  const categoryScrollRef = useRef<HTMLDivElement>(null)
   const [csvText, setCsvText] = useState('')
   const [showCsvImport, setShowCsvImport] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -541,7 +547,31 @@ export default function AdminPage() {
               )}
             </AnimatePresence>
 
-            {/* Category Filter */}
+            {/* Category Filter with scroll buttons */}
+            <div className="relative mb-6">
+              <button
+                onClick={() => categoryScrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' })}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-card border border-border shadow-sm hover:bg-muted transition-colors hidden sm:flex"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <div
+                ref={categoryScrollRef}
+                className="flex gap-2 overflow-x-auto scrollbar-hide py-2 px-8 sm:px-10"
+              >
+                <button onClick={() => setAdminCategory('All')} className={cn('px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all', adminCategory === 'All' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground')}>All ({apps.length})</button>
+                {CATEGORIES.map((cat) => {
+                  const count = apps.filter((a) => a.category === cat.name).length
+                  return <button key={cat.name} onClick={() => setAdminCategory(cat.name)} className={cn('px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all', adminCategory === cat.name ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground')}>{cat.name} ({count})</button>
+                })}
+              </div>
+              <button
+                onClick={() => categoryScrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' })}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-card border border-border shadow-sm hover:bg-muted transition-colors hidden sm:flex"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
             <div className="flex gap-2 overflow-x-auto scrollbar-hide py-2 mb-6">
               <button onClick={() => setAdminCategory('All')} className={cn('px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all', adminCategory === 'All' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground')}>All ({apps.length})</button>
               {CATEGORIES.map((cat) => {
