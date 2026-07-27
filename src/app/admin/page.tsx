@@ -100,28 +100,10 @@ export default function AdminPage() {
     setActiveTab('all')
     setEditingVersionIndex(null)
   }
-    setEditingApp(null)
-    setFormData({ name: '', description: '', category: 'Other', logo_url: '', banner_url: '', link: '', developer: '', file_size: '', rating: 0, is_draft: false, priority: 0 })
-    setVersions([])
-    setScreenshots([])
-    setScreenshotInput('')
-    setShowForm(true)
-    setActiveTab('all')
-    setEditingVersionIndex(null)
-  }
 
   const openEditForm = (app: AppItem) => {
     setEditingApp(app)
     setFormData({ ...app, is_draft: (app as any).is_draft || false, priority: (app as any).priority || 0, video_url: app.video_url || '', file_type: app.file_type || '' })
-    setVersions(app.versions || [])
-    setScreenshots(app.screenshots || [])
-    setScreenshotInput('')
-    setShowForm(true)
-    setActiveTab('all')
-    setEditingVersionIndex(null)
-  }
-    setEditingApp(app)
-    setFormData({ ...app, is_draft: (app as any).is_draft || false, priority: (app as any).priority || 0 })
     setVersions(app.versions || [])
     setScreenshots(app.screenshots || [])
     setScreenshotInput('')
