@@ -37,8 +37,6 @@ function Circle({ className }: { className: string }) {
 function Rounded({ className, children }: { className: string; children?: React.ReactNode }) {
   return <div className={`ice-shimmer rounded-2xl ${className}`}>{children}</div>
 }
-  return <div className={`ice-shimmer rounded-2xl ${className}`} />
-}
 
 /* ─── Section wrapper with staggered fade ─── */
 function Section({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -58,8 +56,6 @@ export function AppDetailSkeleton() {
     <>
       <ShimmerStyle />
       <div className="min-h-screen bg-background">
-        {/* Navbar already rendered by layout — skip skeleton */}
-
         <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pt-6 pb-20">
           {/* Back link skeleton */}
           <Section delay={0}>
@@ -78,13 +74,9 @@ export function AppDetailSkeleton() {
               {/* Content */}
               <div className="relative px-6 pb-6 -mt-16 sm:-mt-20">
                 <div className="flex items-end gap-4 sm:gap-5">
-                  {/* Logo placeholder */}
                   <Rounded className="h-20 w-20 sm:h-24 sm:w-24 shrink-0 border-4 border-card shadow-xl" />
-
                   <div className="flex-1 min-w-0 pb-1 space-y-2">
-                    {/* Title */}
                     <Bar className="h-8 w-48 sm:w-64 rounded-lg" />
-                    {/* Category */}
                     <Bar className="h-4 w-24 rounded-md" />
                   </div>
                 </div>
@@ -108,7 +100,7 @@ export function AppDetailSkeleton() {
             </div>
           </Section>
 
-          {/* ═══ Video Preview (always show skeleton — optional content) ═══ */}
+          {/* ═══ Video Preview ═══ */}
           <Section delay={0.1}>
             <div className="mt-8">
               <Bar className="h-6 w-36 rounded-lg mb-3" />
@@ -143,10 +135,10 @@ export function AppDetailSkeleton() {
           <Section delay={0.25}>
             <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <Rounded key={i} className="h-20 w-full p-4 space-y-2">
+                <div key={i} className="ice-shimmer rounded-2xl h-20 w-full p-4 space-y-2">
                   <Bar className="h-3 w-16 rounded-md" />
                   <Bar className="h-4 w-20 rounded-md" />
-                </Rounded>
+                </div>
               ))}
             </div>
           </Section>
