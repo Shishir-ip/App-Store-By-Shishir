@@ -53,9 +53,6 @@ export default function AdminPage() {
     link: '', developer: '', file_size: '', rating: 0, is_draft: false, priority: 0,
     video_url: '', file_type: '',
   })
-    name: '', description: '', category: 'Other', logo_url: '', banner_url: '',
-    link: '', developer: '', file_size: '', rating: 0, is_draft: false, priority: 0,
-  })
   const [versionForm, setVersionForm] = useState({ version: '', direct_link: '' })
   const [versions, setVersions] = useState<Partial<AppVersion>[]>([])
   const [showVersionForm, setShowVersionForm] = useState(false)
