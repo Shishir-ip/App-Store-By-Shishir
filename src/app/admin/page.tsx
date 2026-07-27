@@ -71,11 +71,8 @@ export default function AdminPage() {
 
   // Category scroll
   const categoryScrollRef = useRef<HTMLDivElement>(null)
-  const [csvText, setCsvText] = useState('')
-  const [showCsvImport, setShowCsvImport] = useState(false)
-  const fileRef = useRef<HTMLInputElement>(null)
 
-  // Load requests when view changes
+
   useEffect(() => {
     if (isAuthenticated && adminView === 'requests') {
       loadRequests()
@@ -572,13 +569,7 @@ export default function AdminPage() {
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide py-2 mb-6">
-              <button onClick={() => setAdminCategory('All')} className={cn('px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all', adminCategory === 'All' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground')}>All ({apps.length})</button>
-              {CATEGORIES.map((cat) => {
-                const count = apps.filter((a) => a.category === cat.name).length
-                return <button key={cat.name} onClick={() => setAdminCategory(cat.name)} className={cn('px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all', adminCategory === cat.name ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground')}>{cat.name} ({count})</button>
-              })}
-            </div>
+
 
             {/* Apps List */}
             {appsLoading ? (
