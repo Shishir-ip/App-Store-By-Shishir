@@ -152,36 +152,6 @@ export default function AdminPage() {
       setSaving(false)
     }
   }
-    if (!formData.name) return
-    setSaving(true)
-    const { versions: _, screenshots: __, ...appDataWithoutArrays } = formData
-    const appData = {
-      ...appDataWithoutArrays,
-      rating: formData.rating ? Number(formData.rating) : null,
-    }
-
-    let app: AppItem | null
-    if (editingApp) app = await editApp(editingApp.id, appData)
-    else app = await addApp(appData)
-
-    if (app) {
-      // Save screenshots to relational table
-      await syncScreenshots(app.id, screenshots)
-
-      for (const v of versions) {
-        if (v.id) await updateVersion(v.id, v as Partial<AppVersion>)
-        else if (v.version && v.direct_link) await createVersion({ ...v, app_id: app.id } as Partial<AppVersion>)
-      }
-      await loadApps()
-      setShowForm(false)
-      setEditingApp(null)
-      setVersions([])
-      setScreenshots([])
-      setEditingVersionIndex(null)
-      showToast(editingApp ? 'App updated!' : 'App created!', 'success')
-    }
-    setSaving(false)
-  }
 
   const handleDelete = async (id: string) => {
     const success = await removeApp(id)
