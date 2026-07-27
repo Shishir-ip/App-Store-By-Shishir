@@ -34,7 +34,9 @@ function Circle({ className }: { className: string }) {
   return <div className={`ice-shimmer rounded-full ${className}`} />
 }
 
-function Rounded({ className }: { className: string }) {
+function Rounded({ className, children }: { className: string; children?: React.ReactNode }) {
+  return <div className={`ice-shimmer rounded-2xl ${className}`}>{children}</div>
+}
   return <div className={`ice-shimmer rounded-2xl ${className}`} />
 }
 
