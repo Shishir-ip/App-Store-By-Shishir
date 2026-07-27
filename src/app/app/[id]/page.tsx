@@ -1,8 +1,10 @@
+import { Suspense } from 'react'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { fetchApps } from '@/lib/supabase'
 import { AppItem } from '@/lib/types'
 import AppDetailClient from './AppDetailClient'
+import { AppDetailSkeleton } from '@/components/AppDetailSkeleton'
 
 // Force dynamic rendering — never serve stale cached data
 export const dynamic = 'force-dynamic'
@@ -34,5 +36,9 @@ export default async function AppDetailPage({ params }: Props) {
     notFound()
   }
 
-  return <AppDetailClient app={app} allApps={apps} />
+  return (
+    <Suspense fallback={<AppDetailSkeleton />}>
+      <AppDetailClient app={app} allApps={apps} />
+    </Suspense>
+  )
 }
