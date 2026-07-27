@@ -117,7 +117,7 @@ export default function AdminPage() {
     setSaving(true)
     try {
       // Strip fields that shouldn't be sent to Supabase
-      const { id, created_at, updated_at, downloads, versions, screenshots, ...rest } = formData as any
+      const { id: _id, created_at: _ca, updated_at: _ua, downloads: _dl, versions: _v, screenshots: _ss, ...rest } = formData as any
       const appData = {
         ...rest,
         rating: formData.rating ? Number(formData.rating) : null,
