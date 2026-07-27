@@ -120,7 +120,17 @@ export default function AdminPage() {
       const { id: _id, created_at: _ca, updated_at: _ua, downloads: _dl, versions: _v, screenshots: _ss, ...rest } = formData as any
       const appData = {
         ...rest,
-        rating: formData.rating ? Number(formData.rating) : null,
+        // Convert empty strings to null for optional fields
+        description: rest.description || null,
+        logo_url: rest.logo_url || null,
+        banner_url: rest.banner_url || null,
+        link: rest.link || null,
+        developer: rest.developer || null,
+        file_size: rest.file_size || null,
+        video_url: rest.video_url || null,
+        file_type: rest.file_type || null,
+        // Rating: keep 0 as 0, convert empty to null
+        rating: rest.rating !== undefined && rest.rating !== null && rest.rating !== '' ? Number(rest.rating) : null,
       }
 
       let app: AppItem | null
