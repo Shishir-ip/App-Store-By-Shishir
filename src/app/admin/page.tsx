@@ -115,6 +115,45 @@ export default function AdminPage() {
   const handleSave = async () => {
     if (!formData.name) return
     setSaving(true)
+    try {
+      // Strip fields that shouldn't be sent to Supabase
+      const { id, created_at, updated_at, downloads, versions, screenshots, ...rest } = formData as any
+      const appData = {
+        ...rest,
+        rating: formData.rating ? Number(formData.rating) : null,
+      }
+
+      let app: AppItem | null
+      if (editingApp) app = await editApp(editingApp.id, appData)
+      else app = await addApp(appData)
+
+      if (app) {
+        // Save screenshots to relational table
+        await syncScreenshots(app.id, screenshots)
+
+        for (const v of versions) {
+          if (v.id) await updateVersion(v.id, v as Partial<AppVersion>)
+          else if (v.version && v.direct_link) await createVersion({ ...v, app_id: app.id } as Partial<AppVersion>)
+        }
+        await loadApps()
+        setShowForm(false)
+        setEditingApp(null)
+        setVersions([])
+        setScreenshots([])
+        setEditingVersionIndex(null)
+        showToast(editingApp ? 'App updated!' : 'App created!', 'success')
+      } else {
+        showToast('Failed to save app. Check console for details.', 'error')
+      }
+    } catch (err: any) {
+      console.error('Save error:', err)
+      showToast(err?.message || 'Something went wrong while saving.', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+    if (!formData.name) return
+    setSaving(true)
     const { versions: _, screenshots: __, ...appDataWithoutArrays } = formData
     const appData = {
       ...appDataWithoutArrays,
