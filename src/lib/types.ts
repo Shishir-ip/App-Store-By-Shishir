@@ -32,6 +32,27 @@ export interface AppItem {
   is_draft?: boolean
   priority?: number
   screenshots?: string[]
+  video_url?: string | null
+  file_type?: string | null
+}
+  id: string
+  name: string
+  description: string | null
+  category: string
+  logo_url: string | null
+  banner_url: string | null
+  link: string | null
+  developer: string | null
+  file_size: string | null
+  rating: number | null
+  downloads: number
+  created_at: string
+  updated_at: string
+  versions?: AppVersion[]
+  // New fields (add to Supabase)
+  is_draft?: boolean
+  priority?: number
+  screenshots?: string[]
 }
 
 export interface AppRequest {

@@ -1,12 +1,28 @@
 'use client'
 
-import { Download, Star, Heart } from 'lucide-react'
+import { Download, Star, Heart, FileCode, Monitor, Smartphone, Tablet } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { AppItem } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { incrementDownloads } from '@/lib/supabase'
 import { useFavorites } from './FavoritesProvider'
 import { showToast } from './Toast'
+
+const FILE_TYPE_ICONS: Record<string, React.ReactNode> = {
+  APK: <Smartphone className="h-3 w-3" />,
+  IPA: <Tablet className="h-3 w-3" />,
+  EXE: <Monitor className="h-3 w-3" />,
+  DMG: <Monitor className="h-3 w-3" />,
+  ZIP: <FileCode className="h-3 w-3" />,
+}
+
+const FILE_TYPE_COLORS: Record<string, string> = {
+  APK: 'bg-green-500/10 text-green-600',
+  IPA: 'bg-blue-500/10 text-blue-600',
+  EXE: 'bg-sky-500/10 text-sky-600',
+  DMG: 'bg-purple-500/10 text-purple-600',
+  ZIP: 'bg-orange-500/10 text-orange-600',
+}
 
 interface AppCardProps {
   app: AppItem
@@ -37,6 +53,10 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
   const hasVersions = app.versions && app.versions.length > 0
   const displayVersion = hasVersions ? app.versions![0].version : '1.0.0'
 
+  const fileType = app.file_type?.toUpperCase()
+  const fileTypeIcon = fileType ? (FILE_TYPE_ICONS[fileType] || <FileCode className="h-3 w-3" />) : null
+  const fileTypeColor = fileType ? (FILE_TYPE_COLORS[fileType] || 'bg-muted text-muted-foreground') : ''
+
   // ─── COMPACT VIEW ───
   if (view === 'compact') {
     return (
@@ -64,6 +84,11 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
           {app.name}
         </p>
         <p className="text-[10px] text-muted-foreground truncate w-full px-1">{app.category}</p>
+        {fileType && (
+          <span className={cn('mt-0.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium', fileTypeColor)}>
+            {fileTypeIcon}{fileType}
+          </span>
+        )}
         {isFavorite(app.id) && (
           <Heart className="absolute -top-1 -right-1 h-3.5 w-3.5 text-rose-500 fill-rose-500" />
         )}
@@ -100,6 +125,11 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">{app.name}</h3>
             {isFavorite(app.id) && <Heart className="h-3 w-3 text-rose-500 fill-rose-500 shrink-0" />}
+            {fileType && (
+              <span className={cn('inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium', fileTypeColor)}>
+                {fileTypeIcon}{fileType}
+              </span>
+            )}
           </div>
           <p className="text-sm text-muted-foreground truncate">{app.category}{app.description ? ` · ${app.description}` : ''}</p>
           <div className="flex items-center gap-3 mt-1">
@@ -167,12 +197,16 @@ export function AppCard({ app, index, onClick, view = 'grid' }: AppCardProps) {
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">{app.name}</h3>
             <p className="text-sm text-muted-foreground mt-0.5">{app.category}</p>
-            <div className="flex items-center gap-3 mt-1.5">
+            <div className="flex items-center gap-2 mt-1.5">
               {app.rating && app.rating > 0 && (
                 <div className="flex items-center gap-1 text-amber-500"><Star className="h-3.5 w-3.5 fill-current" /><span className="text-xs font-medium">{app.rating.toFixed(1)}</span></div>
               )}
               <div className="flex items-center gap-1 text-muted-foreground"><Download className="h-3.5 w-3.5" /><span className="text-xs">{(app.downloads || 0).toLocaleString()}</span></div>
-              {displayVersion && <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">v{displayVersion}</span>}
+              {fileType && (
+                <span className={cn('inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium', fileTypeColor)}>
+                  {fileTypeIcon}{fileType}
+                </span>
+              )}
             </div>
           </div>
         </div>

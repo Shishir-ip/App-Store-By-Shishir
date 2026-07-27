@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   Download, Star, ExternalLink, Calendar, User, Hash,
-  ChevronDown, ChevronUp, ArrowLeft, Heart, QrCode,
+  ChevronDown, ChevronUp, ArrowLeft, Heart, QrCode, Play, FileCode,
 } from 'lucide-react'
 import { AppItem } from '@/lib/types'
 import { Navbar } from '@/components/Navbar'
@@ -17,6 +17,14 @@ import { incrementDownloads, supabase } from '@/lib/supabase'
 import { showToast } from '@/components/Toast'
 import Link from 'next/link'
 
+const FILE_TYPE_COLORS: Record<string, string> = {
+  APK: 'bg-green-500/10 text-green-600 border-green-500/20',
+  IPA: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+  EXE: 'bg-sky-500/10 text-sky-600 border-sky-500/20',
+  DMG: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+  ZIP: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
+}
+
 export default function AppDetailClient({ app, allApps }: { app: AppItem; allApps: AppItem[] }) {
   const [showVersions, setShowVersions] = useState(false)
   const [showQr, setShowQr] = useState(false)
@@ -26,34 +34,28 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
   // Client-side fallback: fetch screenshots directly from relational table
   useEffect(() => {
     const fetchScreenshots = async () => {
-      // If server already gave us screenshots, use them
       if (app.screenshots && app.screenshots.length > 0) {
         setScreenshots(app.screenshots)
         return
       }
-
       try {
         const { data, error } = await supabase
           .from('app_screenshots')
           .select('url')
           .eq('app_id', app.id)
           .order('created_at', { ascending: true })
-
         if (error) {
           console.error('Client screenshot fetch error:', error)
           return
         }
-
         if (data && data.length > 0) {
           const urls = data.map((s: any) => s.url)
-          console.log('Client fetched screenshots:', urls)
           setScreenshots(urls)
         }
       } catch (err) {
         console.error('Client screenshot fetch exception:', err)
       }
     }
-
     fetchScreenshots()
   }, [app.id, app.screenshots])
 
@@ -74,6 +76,23 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
   const qrUrl = downloadLink
     ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(downloadLink)}`
     : null
+
+  // Extract YouTube video ID from various URL formats
+  const getYouTubeEmbedUrl = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/,
+    ]
+    for (const p of patterns) {
+      const m = url.match(p)
+      if (m) return `https://www.youtube.com/embed/${m[1]}`
+    }
+    return null
+  }
+
+  const videoEmbed = app.video_url ? getYouTubeEmbedUrl(app.video_url) : null
+  const fileType = app.file_type?.toUpperCase()
+  const fileTypeColor = fileType ? (FILE_TYPE_COLORS[fileType] || 'bg-muted text-muted-foreground border-border') : ''
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,7 +134,14 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
                 </div>
               )}
               <div className="flex-1 min-w-0 pb-1">
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{app.name}</h1>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{app.name}</h1>
+                  {fileType && (
+                    <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium border', fileTypeColor)}>
+                      <FileCode className="h-3 w-3" />{fileType}
+                    </span>
+                  )}
+                </div>
                 <p className="text-muted-foreground mt-0.5">{app.category}</p>
               </div>
             </div>
@@ -129,8 +155,8 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
               {app.file_size && <div className="flex items-center gap-1.5 text-muted-foreground"><Hash className="h-4 w-4" /><span>{app.file_size}</span></div>}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3 mt-5">
+            {/* Action Buttons — flex-wrap for mobile */}
+            <div className="flex items-center gap-3 mt-5 flex-wrap">
               <button onClick={() => handleDownload()} className={cn('flex-1 sm:flex-none flex items-center justify-center gap-2 py-2.5 px-6 rounded-xl text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all')}>
                 <Download className="h-4 w-4" /> Download
               </button>
@@ -151,15 +177,37 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
               )}
             </div>
 
-            {/* QR Code */}
+            {/* QR Code — outside the overflow-hidden card area */}
             {showQr && qrUrl && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-4 p-4 rounded-2xl bg-muted border border-border inline-flex flex-col items-center gap-2">
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-4 p-4 rounded-2xl bg-muted border border-border inline-flex flex-col items-center gap-2"
+              >
                 <img src={qrUrl} alt="QR Code" className="h-36 w-36 rounded-xl" />
                 <p className="text-xs text-muted-foreground">Scan to download</p>
               </motion.div>
             )}
           </div>
         </motion.div>
+
+        {/* ─── Video Preview ─── */}
+        {videoEmbed && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mt-8">
+            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Play className="h-4 w-4 text-primary" /> Video Preview
+            </h2>
+            <div className="relative rounded-2xl overflow-hidden border border-border aspect-video">
+              <iframe
+                src={videoEmbed}
+                title={`${app.name} video preview`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
+          </motion.div>
+        )}
 
         {/* ─── Screenshots ─── */}
         {screenshots.length > 0 && (

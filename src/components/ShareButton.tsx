@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Share2, Copy, Check, Link2 } from 'lucide-react'
+import { Share2, Copy, Check, Link2, MessageCircle, Send, Twitter, Facebook } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { showToast } from './Toast'
@@ -21,6 +21,8 @@ export function ShareButton({ appName, appId, directLink, className }: ShareButt
     ? `${window.location.origin}/app/${appId}/`
     : `/app/${appId}/`
 
+  const shareText = `Check out ${appName} on App Store!`
+
   const handleCopy = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text)
@@ -31,6 +33,33 @@ export function ShareButton({ appName, appId, directLink, className }: ShareButt
       showToast('Failed to copy', 'error')
     }
   }
+
+  const socialLinks = [
+    {
+      name: 'WhatsApp',
+      icon: <MessageCircle className="h-4 w-4" />,
+      color: 'text-green-500',
+      href: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${appUrl}`)}`,
+    },
+    {
+      name: 'Telegram',
+      icon: <Send className="h-4 w-4" />,
+      color: 'text-sky-500',
+      href: `https://t.me/share/url?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(shareText)}`,
+    },
+    {
+      name: 'Twitter',
+      icon: <Twitter className="h-4 w-4" />,
+      color: 'text-slate-800 dark:text-slate-200',
+      href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(appUrl)}`,
+    },
+    {
+      name: 'Facebook',
+      icon: <Facebook className="h-4 w-4" />,
+      color: 'text-blue-600',
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(appUrl)}`,
+    },
+  ]
 
   return (
     <div className={cn('relative', className)}>
@@ -45,14 +74,38 @@ export function ShareButton({ appName, appId, directLink, className }: ShareButt
       <AnimatePresence>
         {open && (
           <>
-            <div className="fixed inset-0 z-[90]" onClick={() => setOpen(false)} />
+            {/* Backdrop — covers everything */}
+            <div className="fixed inset-0 z-[200]" onClick={() => setOpen(false)} />
+            {/* Dropdown — high z-index, positioned with portal-like behavior */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 5 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 5 }}
-              className="absolute right-0 top-full mt-2 w-64 p-3 rounded-2xl bg-card border border-border shadow-xl z-[100]"
+              transition={{ duration: 0.15 }}
+              className="fixed z-[210] right-4 sm:right-auto sm:absolute sm:right-0 sm:top-full sm:mt-2 w-[280px] p-3 rounded-2xl bg-card border border-border shadow-2xl"
+              style={typeof window !== 'undefined' ? undefined : {}}
             >
               <p className="text-xs font-medium text-muted-foreground mb-2 px-1">Share {appName}</p>
+
+              {/* Social buttons */}
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setOpen(false)}
+                    className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-muted transition-colors"
+                  >
+                    <span className={social.color}>{social.icon}</span>
+                    <span className="text-[10px] text-muted-foreground">{social.name}</span>
+                  </a>
+                ))}
+              </div>
+
+              <div className="h-px bg-border my-2" />
+
               <button
                 onClick={() => handleCopy(appUrl, 'App link')}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-muted transition-colors text-left"

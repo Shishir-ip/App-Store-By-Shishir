@@ -12,8 +12,10 @@ import { EmptyState } from '@/components/EmptyState'
 import { useApps } from '@/hooks/useApps'
 import { AppItem } from '@/lib/types'
 import { useState, useMemo } from 'react'
-import { ArrowDown, LayoutGrid, List, Grid3X3 } from 'lucide-react'
+import { ArrowDown, LayoutGrid, List, Grid3X3, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+const APPS_PER_PAGE = 12
 
 export default function HomePage() {
   const router = useRouter()
@@ -21,6 +23,7 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [viewMode, setViewMode] = useState<'grid' | 'compact' | 'list'>('grid')
+  const [currentPage, setCurrentPage] = useState(1)
 
   const filteredApps = useMemo(() => {
     return apps.filter((app) => {
@@ -30,6 +33,17 @@ export default function HomePage() {
       return matchesSearch && matchesCategory
     })
   }, [apps, searchQuery, selectedCategory])
+
+  // Reset page when filters change
+  useMemo(() => {
+    setCurrentPage(1)
+  }, [searchQuery, selectedCategory])
+
+  const totalPages = Math.max(1, Math.ceil(filteredApps.length / APPS_PER_PAGE))
+  const paginatedApps = useMemo(() => {
+    const start = (currentPage - 1) * APPS_PER_PAGE
+    return filteredApps.slice(start, start + APPS_PER_PAGE)
+  }, [filteredApps, currentPage])
 
   const featuredApps = useMemo(() => {
     return [...apps].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)).slice(0, 6)
@@ -44,11 +58,28 @@ export default function HomePage() {
     router.push(`/app/${app.id}/`)
   }
 
+  // Generate page numbers to show
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = []
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i)
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', totalPages)
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages)
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages)
+      }
+    }
+    return pages
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Hero Section — overflow-hidden REMOVED to fix search dropdown clipping */}
+      {/* Hero Section */}
       <section className="relative pt-10 pb-6 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <motion.div
@@ -157,16 +188,74 @@ export default function HomePage() {
                   : <SkeletonCard key={i} />
               ))}
             </div>
-          ) : filteredApps.length > 0 ? (
-            <div className={cn(
-              viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
-                : viewMode === 'compact' ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4'
-                : 'flex flex-col gap-3'
-            )}>
-              {filteredApps.map((app, index) => (
-                <AppCard key={app.id} app={app} index={index} onClick={() => handleAppClick(app)} view={viewMode} />
-              ))}
-            </div>
+          ) : paginatedApps.length > 0 ? (
+            <>
+              <div className={cn(
+                viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
+                  : viewMode === 'compact' ? 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4'
+                  : 'flex flex-col gap-3'
+              )}>
+                {paginatedApps.map((app, index) => (
+                  <AppCard key={app.id} app={app} index={index} onClick={() => handleAppClick(app)} view={viewMode} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-10">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className={cn(
+                      'flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-colors',
+                      currentPage === 1
+                        ? 'text-muted-foreground cursor-not-allowed'
+                        : 'bg-muted text-foreground hover:bg-muted/80'
+                    )}
+                  >
+                    <ChevronLeft className="h-4 w-4" /> Prev
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {getPageNumbers().map((page, idx) => (
+                      page === '...' ? (
+                        <span key={`dots-${idx}`} className="px-2 text-sm text-muted-foreground">...</span>
+                      ) : (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page as number)}
+                          className={cn(
+                            'h-9 min-w-[36px] px-3 rounded-xl text-sm font-medium transition-colors',
+                            currentPage === page
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80'
+                          )}
+                        >
+                          {page}
+                        </button>
+                      )
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className={cn(
+                      'flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-colors',
+                      currentPage === totalPages
+                        ? 'text-muted-foreground cursor-not-allowed'
+                        : 'bg-muted text-foreground hover:bg-muted/80'
+                    )}
+                  >
+                    Next <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+
+              <p className="text-center text-xs text-muted-foreground mt-3">
+                Showing {(currentPage - 1) * APPS_PER_PAGE + 1}–{Math.min(currentPage * APPS_PER_PAGE, filteredApps.length)} of {filteredApps.length} apps
+              </p>
+            </>
           ) : (
             <EmptyState type={searchQuery ? 'no-results' : 'no-apps'} />
           )}

@@ -51,6 +51,10 @@ export default function AdminPage() {
   const [formData, setFormData] = useState<Partial<AppItem> & { is_draft?: boolean; priority?: number }>({
     name: '', description: '', category: 'Other', logo_url: '', banner_url: '',
     link: '', developer: '', file_size: '', rating: 0, is_draft: false, priority: 0,
+    video_url: '', file_type: '',
+  })
+    name: '', description: '', category: 'Other', logo_url: '', banner_url: '',
+    link: '', developer: '', file_size: '', rating: 0, is_draft: false, priority: 0,
   })
   const [versionForm, setVersionForm] = useState({ version: '', direct_link: '' })
   const [versions, setVersions] = useState<Partial<AppVersion>[]>([])
@@ -91,6 +95,15 @@ export default function AdminPage() {
 
   const openAddForm = () => {
     setEditingApp(null)
+    setFormData({ name: '', description: '', category: 'Other', logo_url: '', banner_url: '', link: '', developer: '', file_size: '', rating: 0, is_draft: false, priority: 0, video_url: '', file_type: '' })
+    setVersions([])
+    setScreenshots([])
+    setScreenshotInput('')
+    setShowForm(true)
+    setActiveTab('all')
+    setEditingVersionIndex(null)
+  }
+    setEditingApp(null)
     setFormData({ name: '', description: '', category: 'Other', logo_url: '', banner_url: '', link: '', developer: '', file_size: '', rating: 0, is_draft: false, priority: 0 })
     setVersions([])
     setScreenshots([])
@@ -101,6 +114,15 @@ export default function AdminPage() {
   }
 
   const openEditForm = (app: AppItem) => {
+    setEditingApp(app)
+    setFormData({ ...app, is_draft: (app as any).is_draft || false, priority: (app as any).priority || 0, video_url: app.video_url || '', file_type: app.file_type || '' })
+    setVersions(app.versions || [])
+    setScreenshots(app.screenshots || [])
+    setScreenshotInput('')
+    setShowForm(true)
+    setActiveTab('all')
+    setEditingVersionIndex(null)
+  }
     setEditingApp(app)
     setFormData({ ...app, is_draft: (app as any).is_draft || false, priority: (app as any).priority || 0 })
     setVersions(app.versions || [])
@@ -248,6 +270,35 @@ export default function AdminPage() {
     showToast(`${count} apps imported!`, 'success')
   }
 
+  // ─── CSV Export ───
+  const exportCsv = () => {
+    const headers = ['name','category','description','logo_url','banner_url','link','developer','file_size','rating','priority','is_draft','file_type','video_url']
+    const rows = apps.map((app) => {
+      const vals = [
+        app.name, app.category, app.description || '', app.logo_url || '',
+        app.banner_url || '', app.link || '', app.developer || '',
+        app.file_size || '', app.rating || '', app.priority || 0,
+        app.is_draft ? 'true' : 'false', app.file_type || '', app.video_url || ''
+      ]
+      return vals.map((v) => {
+        const s = String(v).replace(/"/g, '""')
+        return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s}"` : s
+      }).join(',')
+    })
+    const csv = [headers.join(','), ...rows].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `app-store-apps-${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showToast('Apps exported to CSV!', 'success')
+  }
+
+
   // ─── Versions ───
   const addVersionToForm = () => {
     if (versionForm.version && versionForm.direct_link) {
@@ -324,6 +375,27 @@ export default function AdminPage() {
   const featuredApps = apps.filter((a) => (a.priority || 0) > 0).sort((a, b) => (b.priority || 0) - (a.priority || 0))
 
   // Preview data
+  const previewApp: AppItem = {
+    id: 'preview',
+    name: formData.name || 'App Name',
+    description: formData.description || null,
+    category: formData.category || 'Other',
+    logo_url: formData.logo_url || null,
+    banner_url: formData.banner_url || null,
+    link: formData.link || null,
+    developer: formData.developer || null,
+    file_size: formData.file_size || null,
+    rating: formData.rating || null,
+    downloads: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    versions: versions as AppVersion[],
+    screenshots,
+    is_draft: formData.is_draft,
+    priority: formData.priority,
+    video_url: formData.video_url || null,
+    file_type: formData.file_type || null,
+  }
   const previewApp: AppItem = {
     id: 'preview',
     name: formData.name || 'App Name',
@@ -441,7 +513,10 @@ export default function AdminPage() {
                   <CheckSquare className="h-4 w-4" /> {bulkMode ? 'Done' : 'Bulk'}
                 </button>
                 <button onClick={() => setShowCsvImport(!showCsvImport)} className="flex items-center gap-2 h-11 px-4 rounded-xl bg-muted text-muted-foreground hover:text-foreground font-medium text-sm transition-colors">
-                  <Upload className="h-4 w-4" /> CSV
+                  <Upload className="h-4 w-4" /> Import
+                </button>
+                <button onClick={exportCsv} className="flex items-center gap-2 h-11 px-4 rounded-xl bg-muted text-muted-foreground hover:text-foreground font-medium text-sm transition-colors" title="Export all apps to CSV">
+                  <Download className="h-4 w-4" /> Export
                 </button>
                 <button onClick={openAddForm} className="flex items-center gap-2 h-11 px-6 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"><Plus className="h-4 w-4" /> Add</button>
               </div>
@@ -595,6 +670,22 @@ export default function AdminPage() {
                     <input type="number" min={0} max={5} step={0.1} value={formData.rating || ''} onChange={(e) => setFormData({ ...formData, rating: Number(e.target.value) })} className="w-full h-11 px-4 rounded-xl bg-muted border border-border focus:bg-background focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all" placeholder="4.5" /></div>
                 </div>
 
+
+                {/* Video URL & File Type */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div><label className="block text-sm font-medium mb-1.5">Video Preview URL (YouTube, etc.)</label>
+                    <input type="url" value={formData.video_url || ''} onChange={(e) => setFormData({ ...formData, video_url: e.target.value })} className="w-full h-11 px-4 rounded-xl bg-muted border border-border focus:bg-background focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all" placeholder="https://youtube.com/watch?v=..." /></div>
+                  <div><label className="block text-sm font-medium mb-1.5">File Type</label>
+                    <select value={formData.file_type || ''} onChange={(e) => setFormData({ ...formData, file_type: e.target.value })} className="w-full h-11 px-4 rounded-xl bg-muted border border-border focus:bg-background focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all">
+                      <option value="">Select type...</option>
+                      <option value="APK">APK (Android)</option>
+                      <option value="IPA">IPA (iOS)</option>
+                      <option value="EXE">EXE (Windows)</option>
+                      <option value="DMG">DMG (macOS)</option>
+                      <option value="ZIP">ZIP (Archive)</option>
+                      <option value="Other">Other</option>
+                    </select></div>
+                </div>
                 {/* Priority & Draft */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div><label className="block text-sm font-medium mb-1.5">Priority (0=normal, 1+=featured)</label>
