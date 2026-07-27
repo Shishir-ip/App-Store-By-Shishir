@@ -107,10 +107,10 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative rounded-3xl overflow-hidden bg-card border border-border"
+          className="relative rounded-3xl bg-card border border-border"
         >
-          {/* Banner Background */}
-          <div className="relative h-40 sm:h-52">
+          {/* Banner Background — overflow-hidden here for rounded top corners */}
+          <div className="relative h-40 sm:h-52 rounded-t-3xl overflow-hidden">
             {app.banner_url ? (
               <img src={app.banner_url} alt={app.name} className="h-full w-full object-cover" />
             ) : (
