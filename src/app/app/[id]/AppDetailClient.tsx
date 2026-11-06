@@ -73,9 +73,12 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
     .slice(0, 4)
 
   const downloadLink = app.versions?.[0]?.direct_link || app.link || ''
-  const qrUrl = downloadLink
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(downloadLink)}`
-    : null
+
+  // QR code redirects to this app's page (not direct download)
+  const appPageUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/app/${app.id}/`
+    : `https://app-store-by-shishir.vercel.app/app/${app.id}/`
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(appPageUrl)}`
 
   // Extract YouTube video ID from various URL formats
   const getYouTubeEmbedUrl = (url: string): string | null => {
@@ -185,7 +188,7 @@ export default function AppDetailClient({ app, allApps }: { app: AppItem; allApp
                 className="mt-4 p-4 rounded-2xl bg-muted border border-border inline-flex flex-col items-center gap-2"
               >
                 <img src={qrUrl} alt="QR Code" className="h-36 w-36 rounded-xl" />
-                <p className="text-xs text-muted-foreground">Scan to download</p>
+                <p className="text-xs text-muted-foreground">Scan to view app</p>
               </motion.div>
             )}
           </div>
