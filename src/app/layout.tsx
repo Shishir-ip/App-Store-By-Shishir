@@ -10,12 +10,20 @@ import { BackToTop } from '@/components/BackToTop'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'App Store',
-  description: 'Discover and download amazing apps',
+  title: 'App Store by Shishir',
+  description: 'App Store by Shishir — Discover and download amazing apps, APKs, and tools. Your one-stop destination for the best apps.',
+  keywords: ['app store by shishir', 'appstore by shishir', 'apxtore', 'shishir app store', 'shishir appstore', 'appstore by shohidul islam shishir', 'app store', 'download apps', 'apk store'],
   manifest: '/manifest.json',
   icons: {
     icon: '/icon.png',
     apple: '/icon.png',
+  },
+  openGraph: {
+    title: 'App Store by Shishir',
+    description: 'Discover and download amazing apps, APKs, and tools.',
+    url: 'https://app-store-by-shishir.vercel.app',
+    siteName: 'App Store by Shishir',
+    type: 'website',
   },
 }
 
